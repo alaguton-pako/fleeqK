@@ -31,17 +31,17 @@ const Calendar = ({ weekBookings, weekDates }: CalendarProps) => {
   };
 
   // Function to get booking title for a time slot
-  const getBookingTitle = (day: string, time: string) => {
-    const booking = weekBookings.find((booking) => {
-      const bookingDay = dayjs(booking.date).format("ddd").toUpperCase();
-      const [startTime] = normalizeTime(booking.time)
-        .split(" - ")
-        .map(extractHour);
+  // const getBookingTitle = (day: string, time: string) => {
+  //   const booking = weekBookings.find((booking) => {
+  //     const bookingDay = dayjs(booking.date).format("ddd").toUpperCase();
+  //     const [startTime] = normalizeTime(booking.time)
+  //       .split(" - ")
+  //       .map(extractHour);
 
-      return bookingDay === day && extractHour(time) === startTime;
-    });
-    return booking?.title || "Booked";
-  };
+  //     return bookingDay === day && extractHour(time) === startTime;
+  //   });
+  //   return booking?.title || "Booked";
+  // };
 
   // Function to determine cell background color
   const getCellBackground = (day: string) => {
@@ -57,12 +57,44 @@ const Calendar = ({ weekBookings, weekDates }: CalendarProps) => {
     }
   };
 
+  const statusStyles: Record<
+    string,
+    { border: string; text: string; label: string }
+  > = {
+    Active: {
+      border: "border-l-[#FF5859]",
+      text: "text-[#FF5859]",
+      label: "Booking made",
+    },
+    Pending: {
+      border: "border-l-[#FFDF8F]",
+      text: "text-[#FFDF8F]",
+      label: "Booking pending",
+    },
+    Completed: {
+      border: "border-l-[#05A660]",
+      text: "text-[#05A660]",
+      label: "Booking completed",
+    },
+    Rescheduled: {
+      border: "border-l-[#9A9A9A]",
+      text: "text-[#9A9A9A]",
+      label: "Booking rescheduled",
+    },
+    Cancelled: {
+      border: "border-l-[#EB996E]",
+      text: "text-[#EB996E]",
+      label: "Booking cancelled",
+    },
+  };
+
   return (
     <div className="w-9/12 bg-white py-4 h-full overflow-auto scrollbar-hide">
       <div className="flex items-center justify-end">
         <span className="py-1 px-6 text-white bg-primary rounded-lg">Week</span>
         <span className="py-1 px-6 text-[#71717A] rounded-lg">Month</span>
       </div>
+
       <div className="py-6 overflow-auto">
         <div className="grid grid-cols-8 w-full">
           {/* Column headers */}
@@ -109,7 +141,34 @@ const Calendar = ({ weekBookings, weekDates }: CalendarProps) => {
                       dayObj.day
                     )} ${
                       isBooked
-                        ? "bg-[#FFF1F1] border-l-3 rounded-tl-lg rounded-bl-lg border-l-[#FF5859] text-[#FF5859] font-semibold text-xs"
+                        ? (() => {
+                            const booking = weekBookings.find((booking) => {
+                              const bookingDay = dayjs(booking.date)
+                                .format("ddd")
+                                .toUpperCase();
+                              const [startTime] = normalizeTime(booking.time)
+                                .split(" - ")
+                                .map(extractHour);
+
+                              return (
+                                bookingDay === dayObj.day &&
+                                extractHour(time) >= startTime &&
+                                extractHour(time) <
+                                  extractHour(
+                                    normalizeTime(booking.time).split(" - ")[1]
+                                  )
+                              );
+                            });
+
+                            if (!booking)
+                              return "border-l-3 border-l-gray-300 text-gray-500";
+
+                            const style =
+                              statusStyles[booking.status] ||
+                              statusStyles["Active"];
+
+                            return `bg-[#FFF1F1] border-l-3 rounded-tl-lg rounded-bl-lg ${style.border} ${style.text} font-semibold text-xs`;
+                          })()
                         : "border-l-0"
                     }`}
                   >
@@ -118,11 +177,28 @@ const Calendar = ({ weekBookings, weekDates }: CalendarProps) => {
                         <div className="mb-1">
                           {time.replace(/(\d+)( ?[AP]M)/, "$1:00$2")}
                         </div>
-
                         <div>
-                          {isStartTime
-                            ? getBookingTitle(dayObj.day, time)
-                            : "Booking made"}
+                          {(() => {
+                            const booking = weekBookings.find((booking) => {
+                              const bookingDay = dayjs(booking.date)
+                                .format("ddd")
+                                .toUpperCase();
+                              const [startTime] = normalizeTime(booking.time)
+                                .split(" - ")
+                                .map(extractHour);
+                              return (
+                                bookingDay === dayObj.day &&
+                                startTime === extractHour(time)
+                              );
+                            });
+
+                            if (!booking) return "Booking made";
+
+                            const style =
+                              statusStyles[booking.status] ||
+                              statusStyles["Active"];
+                            return style.label;
+                          })()}
                         </div>
                       </div>
                     )}

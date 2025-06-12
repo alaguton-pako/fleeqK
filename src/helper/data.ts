@@ -129,12 +129,6 @@ export const bookingsData: Bookings[] = [
   },
   {
     date: "2025-06-12",
-    time: "2:00pm - 3:00pm",
-    status: "Cancelled",
-    color: "#EB996E",
-  },
-  {
-    date: "2025-06-12",
     time: "4:00pm - 5:00pm",
     status: "Rescheduled",
     color: "#FF5859",
