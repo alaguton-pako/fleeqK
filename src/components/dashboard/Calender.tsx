@@ -109,8 +109,8 @@ const Calendar = ({ weekBookings, weekDates }: CalendarProps) => {
                       dayObj.day
                     )} ${
                       isBooked
-                        ? "bg-[#FFF1F1] border-l-2 border-l-[#FF5859] text-[#FF5859] font-semibold text-xs"
-                        : "border-l-0 bg-[#FFFF]"
+                        ? "bg-[#FFF1F1] border-l-3 rounded-tl-lg rounded-tb-lg border-l-[#FF5859] text-[#FF5859] font-semibold text-xs"
+                        : "border-l-0"
                     }`}
                   >
                     {isStartTime
