@@ -105,7 +105,7 @@ const Calendar = ({ weekBookings, weekDates }: CalendarProps) => {
                 return (
                   <div
                     key={`${dayObj.day}-${time}`}
-                    className={`text-center border border-gray-200 py-8  ${getCellBackground(
+                    className={`text-center border border-gray-200 py-8 ${getCellBackground(
                       dayObj.day
                     )} ${
                       isBooked
@@ -113,11 +113,19 @@ const Calendar = ({ weekBookings, weekDates }: CalendarProps) => {
                         : "border-l-0"
                     }`}
                   >
-                    {isStartTime
-                      ? getBookingTitle(dayObj.day, time)
-                      : isBooked
-                      ? "Booking made"
-                      : ""}
+                    {(isStartTime || isBooked) && (
+                      <div className="flex flex-col items-start text-xs pl-2">
+                        <div className="mb-1">
+                          {time.replace(/(\d+)( ?[AP]M)/, "$1:00$2")}
+                        </div>
+
+                        <div>
+                          {isStartTime
+                            ? getBookingTitle(dayObj.day, time)
+                            : "Booking made"}
+                        </div>
+                      </div>
+                    )}
                   </div>
                 );
               })}

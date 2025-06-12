@@ -11,7 +11,7 @@ const Indicator = () => {
       {data.map((data) => (
         <div key={data.title} className="flex items-center gap-1 mb-2">
           <div
-            className="h-5 w-5 rounded-sm"
+            className="h-3 w-4 rounded-sm"
             style={{ backgroundColor: data.color }}
           ></div>
           <h1 className="text-sm font-semibold" style={{ color: data.color }}>
