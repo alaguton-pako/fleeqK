@@ -1,0 +1,160 @@
+type BookingStatus =
+  | "Active"
+  | "Pending"
+  | "Completed"
+  | "Rescheduled"
+  | "Cancelled";
+
+interface Bookings {
+  date: string;
+  time: string;
+  status: BookingStatus;
+  color: string;
+}
+
+export const bookingsData: Bookings[] = [
+  {
+    date: "2025-06-02",
+    time: "8:00am - 9:00am",
+    status: "Active",
+    color: "#FF5859",
+  },
+  {
+    date: "2025-06-02",
+    time: "9:00am - 10:00am",
+    status: "Completed",
+    color: "#05A660",
+  },
+  {
+    date: "2025-06-02",
+    time: "11:00am - 12:00pm",
+    status: "Cancelled",
+    color: "#EB996E",
+  },
+  {
+    date: "2025-06-02",
+    time: "3:00pm - 4:00pm",
+    status: "Pending",
+    color: "#FFDF8F",
+  },
+  {
+    date: "2025-06-02",
+    time: "1:00pm - 2:00pm",
+    status: "Rescheduled",
+    color: "#9A9A9A",
+  },
+  {
+    date: "2025-06-03",
+    time: "10:00am - 11:00am",
+    status: "Rescheduled",
+    color: "#9A9A9A",
+  },
+  {
+    date: "2025-06-03",
+    time: "12:00pm - 1:00pm",
+    status: "Pending",
+    color: "#FFDF8F",
+  },
+  {
+    date: "2025-06-04",
+    time: "8:00am - 9:00am",
+    status: "Active",
+    color: "#FF5859",
+  },
+  {
+    date: "2025-06-04",
+    time: "1:00pm - 2:00pm",
+    status: "Completed",
+    color: "#05A660",
+  },
+  {
+    date: "2025-06-05",
+    time: "3:00pm - 4:00pm",
+    status: "Cancelled",
+    color: "#EB996E",
+  },
+  {
+    date: "2025-06-05",
+    time: "10:00am - 11:00am",
+    status: "Completed",
+    color: "#05A660",
+  },
+  {
+    date: "2025-06-06",
+    time: "8:00am - 9:00am",
+    status: "Pending",
+    color: "#FFDF8F",
+  },
+  {
+    date: "2025-06-06",
+    time: "2:00pm - 3:00pm",
+    status: "Rescheduled",
+    color: "#9A9A9A",
+  },
+  {
+    date: "2025-06-07",
+    time: "9:00am - 10:00am",
+    status: "Active",
+    color: "#FF5859",
+  },
+  {
+    date: "2025-06-07",
+    time: "1:00pm - 2:00pm",
+    status: "Cancelled",
+    color: "#EB996E",
+  },
+  {
+    date: "2025-06-08",
+    time: "11:00am - 12:00pm",
+    status: "Completed",
+    color: "#05A660",
+  },
+  {
+    date: "2025-06-09",
+    time: "8:00am - 9:00am",
+    status: "Pending",
+    color: "#FFDF8F",
+  },
+  {
+    date: "2025-06-10",
+    time: "10:00am - 11:00am",
+    status: "Rescheduled",
+    color: "#9A9A9A",
+  },
+  {
+    date: "2025-06-11",
+    time: "3:00pm - 4:00pm",
+    status: "Cancelled",
+    color: "#EB996E",
+  },
+  {
+    date: "2025-06-12",
+    time: "2:00pm - 3:00pm",
+    status: "Active",
+    color: "#FF5859",
+  },
+  {
+    date: "2025-06-12",
+    time: "1:00pm - 2:00pm",
+    status: "Active",
+    color: "#FF5859",
+  },
+  {
+    date: "2025-06-12",
+    time: "2:00pm - 3:00pm",
+    status: "Cancelled",
+    color: "#EB996E",
+  },
+  {
+    date: "2025-06-12",
+    time: "4:00pm - 5:00pm",
+    status: "Rescheduled",
+    color: "#FF5859",
+  },
+  {
+    date: "2025-06-13",
+    time: "9:00am - 10:00am",
+    status: "Completed",
+    color: "#05A660",
+  },
+];
