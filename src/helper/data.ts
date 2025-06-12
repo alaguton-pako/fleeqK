@@ -1,16 +1,4 @@
-type BookingStatus =
-  | "Active"
-  | "Pending"
-  | "Completed"
-  | "Rescheduled"
-  | "Cancelled";
-
-interface Bookings {
-  date: string;
-  time: string;
-  status: BookingStatus;
-  color: string;
-}
+import type { Bookings } from "./types";
 
 export const bookingsData: Bookings[] = [
   {

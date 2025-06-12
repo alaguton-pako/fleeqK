@@ -4,6 +4,9 @@ import { BiChevronLeft, BiChevronRight } from "react-icons/bi";
 import { useState } from "react";
 import dayjs, { Dayjs } from "dayjs";
 import { bookingsData } from "../../helper/data";
+import isBetween from "dayjs/plugin/isBetween";
+import { useMemo } from "react";
+dayjs.extend(isBetween);
 
 const daysOfWeek = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
 
@@ -12,32 +15,58 @@ const SideBarCalendar = () => {
   const [currentMonth, setCurrentMonth] = useState(dayjs());
   const [selectedDate, setSelectedDate] = useState(dayjs());
 
+  // Calculate the 7-day period (selected date + next 6 days)
+  const { weekBookings, weekDates } = useMemo(() => {
+    const endDate = selectedDate.add(6, "day");
+
+    // Get all bookings for this 7-day period
+    const filteredBookings = bookingsData.filter((booking) => {
+      const bookingDate = dayjs(booking.date);
+      return bookingDate.isBetween(
+        selectedDate.startOf("day"),
+        endDate.endOf("day"),
+        null,
+        "[]"
+      );
+    });
+
+    // Generate the 7 days information
+    const dates = Array.from({ length: 7 }, (_, i) => {
+      const date = selectedDate.add(i, "day");
+      return {
+        day: date.format("ddd").toUpperCase(), // "MON", "TUE", etc.
+        date: date.date(), // Day number (1-31)
+        fullDate: date.format("YYYY-MM-DD"), // ISO format date
+      };
+    });
+
+    return {
+      weekBookings: filteredBookings,
+      weekDates: dates,
+    };
+  }, [selectedDate]);
+
   // Calculate the first day of month (0-6 where 0=Sunday)
   const startDay = currentMonth.startOf("month").day();
   // Get number of days in current month
   const daysInMonth = currentMonth.daysInMonth();
-
   // Navigation handlers
   const handlePrevious = () =>
     setCurrentMonth(currentMonth.subtract(1, "month"));
   const handleNext = () => setCurrentMonth(currentMonth.add(1, "month"));
-
   // Filter bookings for specific date
   const getBookingsForDate = (date: Dayjs) => {
     return bookingsData.filter((b) => dayjs(b.date).isSame(date, "day"));
   };
-
   // Group bookings by time range for the selected date
   const getTimeRangeSummary = () => {
     const bookings = getBookingsForDate(selectedDate);
     if (bookings.length === 0) return null;
-
     const times = bookings.map((b) => b.time);
     const start = times[0].split(" - ")[0]; // First booking start time
     const end = times[times.length - 1].split(" - ")[1]; // Last booking end time
     return `${start} - ${end}`;
   };
-
   // Count bookings by status for the selected date
   const getStatusCounts = () => {
     const counts = {
@@ -47,11 +76,9 @@ const SideBarCalendar = () => {
       Rescheduled: 0,
       Cancelled: 0,
     };
-
     getBookingsForDate(selectedDate).forEach((booking) => {
       counts[booking.status] += 1;
     });
-
     return counts;
   };
 
@@ -186,7 +213,12 @@ const SideBarCalendar = () => {
           </div>
         </div>
       </div>
-      <Calendar />
+      {/* passed as props here */}
+      <Calendar
+        selectedDate={selectedDate}
+        weekBookings={weekBookings}
+        weekDates={weekDates}
+      />
     </>
   );
 };

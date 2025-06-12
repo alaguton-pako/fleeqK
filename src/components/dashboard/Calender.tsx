@@ -1,39 +1,62 @@
 import React from "react";
+import dayjs from "dayjs";
+import type { CalendarProps } from "../../helper/types";
 
-const days = ["SUN", "MON", "TUE", "WED", "THU", "FRI", "SAT"];
 // Generate times from 7AM to 9PM
 const times = Array.from({ length: 15 }, (_, i) => {
   const hour = 7 + i;
   return hour <= 12 ? `${hour} AM` : `${hour - 12} PM`;
 });
 
-// Mock dates for the current week (Sun 23 - Sat 29)
-const dates = [23, 24, 25, 26, 27, 28, 29];
+// Helper to normalize time formats ("9AM" → "9 AM")
+const normalizeTime = (time: string) => time.replace(/(\d+)([AP]M)/, "$1 $2");
 
-const bookings = [
-  { day: "Mon", time: "9AM", title: "Booking made" },
-  { day: "Thu", time: "1PM", title: "Booking made" },
-  { day: "Fri", time: "3PM", title: "Booking made" },
-  { day: "Sun", time: "8AM", title: "Booking made" },
-];
+// Helper to extract just the hour part ("9 AM" → "9", "11 AM" → "11")
+const extractHour = (time: string) => time.split(" ")[0];
 
-type Day = "Sun" | "Mon" | "Tue" | "Wed" | "Thu" | "Fri" | "Sat";
-type Time = `${number}${"AM" | "PM"}`;
+const Calendar = ({ weekBookings, weekDates }: CalendarProps) => {
+  // Function to check if a time slot is booked
+  const isTimeSlotBooked = (day: string, time: string) => {
+    return weekBookings.some((booking) => {
+      const bookingDay = dayjs(booking.date).format("ddd").toUpperCase();
+      const [startTime, endTime] = normalizeTime(booking.time)
+        .split(" - ")
+        .map(extractHour);
 
-const getSlotStyle = (day: Day, time: Time): string => {
-  const booked = bookings.find((b) => b.day === day && b.time === time);
+      const currentHour = extractHour(time);
+      return (
+        bookingDay === day && currentHour >= startTime && currentHour < endTime
+      );
+    });
+  };
 
-  if (booked) {
-    return "bg-[#FFF1F1] border border-[#FF5859] text-[#FF5859] font-medium";
-  }
+  // Function to get booking title for a time slot
+  const getBookingTitle = (day: string, time: string) => {
+    const booking = weekBookings.find((booking) => {
+      const bookingDay = dayjs(booking.date).format("ddd").toUpperCase();
+      const [startTime] = normalizeTime(booking.time)
+        .split(" - ")
+        .map(extractHour);
 
-  if (day === "Thu") return "bg-[#EFF6FF]";
-  if (day === "Fri") return "bg-[#FAFAFA]";
+      return bookingDay === day && extractHour(time) === startTime;
+    });
+    return booking?.title || "Booked";
+  };
 
-  return "bg-[#FAFAFA]";
-};
+  // Function to determine cell background color
+  const getCellBackground = (day: string) => {
+    switch (day) {
+      case "THU":
+        return "bg-[#EFF6FF]";
+      case "SUN":
+        return "bg-[#FAFAFA]";
+      case "SAT":
+        return "bg-[#F7F7F7]";
+      default:
+        return "bg-white";
+    }
+  };
 
-const Calendar = () => {
   return (
     <div className="w-9/12 bg-white py-4 h-full overflow-auto scrollbar-hide">
       <div className="flex items-center justify-end">
@@ -44,21 +67,15 @@ const Calendar = () => {
         <div className="grid grid-cols-8 w-full">
           {/* Column headers */}
           <div className="font-bold text-center py-2 text-[#1E1E1E]"></div>
-          {days.map((day, index) => (
+          {weekDates.map((dayObj, index) => (
             <div
-              key={day}
+              key={dayObj.day}
               className={`flex flex-col font-bold text-[#1E1E1E] py-2 px-2 ${
                 index !== 0 ? "border-l-1 border-l-[#E0E0E0]" : ""
-              } ${
-                day === "THU"
-                  ? "bg-[#EFF6FF]"
-                  : day === "SAT"
-                  ? "bg-[#F7F7F7]"
-                  : ""
-              }`}
+              } ${getCellBackground(dayObj.day)}`}
             >
-              <span className="text-[#71717A] text-[8px]">{day}</span>
-              <span className="text-sm text-[#1E1E1E]">{dates[index]}</span>
+              <span className="text-[#71717A] text-[8px]">{dayObj.day}</span>
+              <span className="text-sm text-[#1E1E1E]">{dayObj.date}</span>
             </div>
           ))}
 
@@ -71,29 +88,36 @@ const Calendar = () => {
               </div>
 
               {/* Time slots for each day */}
-              {days.map((day) => {
-                const booking = bookings.find(
-                  (b) => b.day === day && b.time === time
-                );
+              {weekDates.map((dayObj) => {
+                const isBooked = isTimeSlotBooked(dayObj.day, time);
+                const isStartTime = weekBookings.some((booking) => {
+                  const bookingDay = dayjs(booking.date)
+                    .format("ddd")
+                    .toUpperCase();
+                  const [startTime] = normalizeTime(booking.time)
+                    .split(" - ")
+                    .map(extractHour);
+                  return (
+                    bookingDay === dayObj.day && startTime === extractHour(time)
+                  );
+                });
 
                 return (
                   <div
-                    key={`${day}-${time}`}
-                    className={`text-center border border-gray-200 p-8 ${
-                      day === "THU"
-                        ? "bg-[#EFF6FF]"
-                        : day === "SUN"
-                        ? "bg-[#FAFAFA]"
-                        : day === "SAT"
-                        ? "bg-[#F7F7F7]"
-                        : "bg-white"
-                    } ${
-                      booking
-                        ? "bg-[#FFF1F1] border-[#FF5859] text-[#FF5859] font-medium"
-                        : ""
+                    key={`${dayObj.day}-${time}`}
+                    className={`text-center border border-gray-200 py-8  ${getCellBackground(
+                      dayObj.day
+                    )} ${
+                      isBooked
+                        ? "bg-[#FFF1F1] border-l-2 border-l-[#FF5859] text-[#FF5859] font-semibold text-xs"
+                        : "border-l-0 bg-[#FFFF]"
                     }`}
                   >
-                    {booking ? booking.title : ""}
+                    {isStartTime
+                      ? getBookingTitle(dayObj.day, time)
+                      : isBooked
+                      ? "Booking made"
+                      : ""}
                   </div>
                 );
               })}
