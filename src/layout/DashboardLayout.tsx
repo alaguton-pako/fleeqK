@@ -5,7 +5,7 @@ import { MdSettings } from "react-icons/md";
 import { Outlet } from "react-router-dom";
 import logo from "../assets/logo.png";
 import laptop from "../assets/laptop.png";
-import notification from "../assets/Notification.png";
+import notification from "../assets/notification.png";
 import user from "../assets/userImage.png";
 
 const DashboardLayout = () => {
